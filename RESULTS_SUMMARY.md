@@ -1,20 +1,21 @@
-# Summary of results (completed experiments)
+# Results summary (corrected with absolute error)
 
-1. Looseness (analytic / discrete-exact)
-- contrast 1.5: ~2.2x, contrast 3: ~3.0x, contrast 5: ~4.0x, contrast 10: ~5.4x
-- Bound becomes looser as a_max/a_min increases (expected from global coercivity).
+## Looseness study (analytic vs discrete-exact), absolute L2
+With error measured as $||u_h - \hat{u}||_2$ and certificate as absolute bound:
+- Contrast 1.5: median ratio ~2.1x, coverage 1.0, FNR 0.0 (tol 5e-3)
+- Contrast 3: ratio ~3.0x, coverage 1.0, FNR 0.0
+- Contrast 5: ratio ~4.0x, coverage 1.0, FNR 0.0
+- Contrast 10: ratio ~5.6x, coverage 1.0, FNR 0.0
 
-2. OOD vs ID (tolerance 5e-3)
-- ID: coverage 1.0, FNR 0.0, mean bound large but safe
-- OOD (larger contrast, longer length scale, different forcing): coverage remains 1.0, FNR 0.0; bounds grow.
+Conclusion: bound is valid (never violated) but increasingly loose with contrast.
 
-3. Selective verification sweep
-- At very loose tolerances (0.1+) many predictions accepted; at stricter tolerances more fall back to reference.
+## Counterexamples
+Tested high-contrast + high-frequency perturbations: no case found with $||r||$ small and $||e||$ large; $bound >= ||e||$ holds for all cases. This matches $e=A_h^{-1}r$.
 
-4. Goal-oriented active learning (QoI = max |u|)
-- Goal-oriented/uncertainty/uniform all reduce RMSE over rounds; differences are small in this RFF surrogate setup (confirms implementation works).
+## OOD (absolute error)
+ID and OOD both show coverage 1.0, FNR 0.0 at tol 5e-3.
 
-5. Identifiability
-- Scaling (c a,c f) vs (a,f): residual features allow separation in synthetic noisy setting but the mathematical identifiability note stands; true indistinguishability from solution/residual alone is a fundamental limit.
+## Selective verification (adaptive)
+For small surrogate errors, certificate accepts only at very loose tolerances; at practical tolerances we fall back to reference. The policy is safe (no false negatives observed).
 
-All tests pass (18/18). Repository: https://github.com/emmettv1191/certno-phd-research
+Key point: the earlier "sharpness/coverage" numbers using relative error were misleading. Using absolute error, the certificate is conservative but correct.
