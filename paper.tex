@@ -1,0 +1,31 @@
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+\title{Error-Certified Neural Operators for Elliptic PDEs}
+\author{certno}
+\date{\today}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We develop an a posteriori error certification framework for learned surrogates of elliptic PDEs. For the discrete SPD system $A_h u_h = f$, any candidate $\hat{u}$ satisfies $\|u_h - \hat{u}\|_2 \le \|r\|_2 / \lambda_{\min}(A_h)$ with $r=f-A_h\hat{u}$. We use a closed-form coercivity bound on $\lambda_{\min}(A_h)$ to obtain a cheap, computable certificate with explicit validity assumptions ($a\ge a_{\min}$). A selective verification policy abstains and falls back to the reference solver only when the bound exceeds tolerance or hypotheses are violated. We evaluate coverage, sharpness, and false-negative rate under controlled distribution shift, and demonstrate the approach on 1D elliptic problems with FNO/DeepONet baselines. We also analyze identifiability limits and goal-oriented active learning for quantities of interest.
+\end{abstract}
+
+\section{Theory}
+For $-\nabla\cdot(a\nabla u)=f$ on $(0,1)^d$ with Dirichlet data and $a\ge a_{\min}>0$, the discrete operator $A_h\succ 0$ yields
+$$
+\|u_h - \hat{u}\|_2 \le \frac{\|f - A_h \hat{u}\|_2}{\lambda_{\min}(A_h)} \le \frac{\|f - A_h \hat{u}\|_2}{a_{\min}\,\lambda_{\min}(-\Delta_h)}.
+$$
+Validity requires $a_{\min}^{(\text{ass})}\le \min_i a_i$. When violated, we do not claim the bound and trigger verification.
+
+\section{Experiments}
+Empirical studies show high coverage under moderate OOD shifts with conservative (loose) bounds; looseness increases with coefficient contrast (analytic vs discrete-exact ratio grows with contrast). Selective verification saves solver calls when tolerance is permissive relative to error distributions.
+
+\section{Limitations}
+The bound is for the discrete system; anisotropy/tightness and extension to H^1/energy norms remain open. Residual-based diagnostics cannot resolve the scaling $(a,f)\equiv(ca,cf)$ without additional priors.
+
+\section{Code}
+\url{https://github.com/emmettv1191/certno-phd-research}
+
+\end{document}
