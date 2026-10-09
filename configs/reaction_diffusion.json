@@ -1,0 +1,9 @@
+{
+  "name": "reaction_diffusion",
+  "n": 96,
+  "nu": 0.02,
+  "T": 0.3,
+  "n_steps": 800,
+  "n_out": 11,
+  "tolerance": 1e-2
+}

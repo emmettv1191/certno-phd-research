@@ -1,0 +1,11 @@
+{
+  "name": "active_learning",
+  "n_pool": 80,
+  "n_test": 32,
+  "n_seed": 20,
+  "n_init": 16,
+  "n_acquire": 4,
+  "length_scale": 0.25,
+  "a_min": 0.1,
+  "a_max": 1.0
+}

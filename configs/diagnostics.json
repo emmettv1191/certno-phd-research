@@ -1,0 +1,10 @@
+{
+  "name": "diagnostics",
+  "n_samples": 160,
+  "n_interior": 63,
+  "a_min": 0.1,
+  "a_max": 1.0,
+  "length_scale": 0.2,
+  "test_fraction": 0.5,
+  "epochs": 600
+}

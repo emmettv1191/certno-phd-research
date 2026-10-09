@@ -1,0 +1,12 @@
+# Core scientific stack
+numpy>=1.24
+scipy>=1.10
+matplotlib>=3.7
+
+# Software tests
+pytest>=7.0
+
+# Operator-learning baselines (CPU wheel)
+# Install with:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.0

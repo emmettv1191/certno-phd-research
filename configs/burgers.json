@@ -1,0 +1,10 @@
+{
+  "name": "burgers",
+  "n": 128,
+  "nu": 0.01,
+  "T": 0.5,
+  "n_steps": 1000,
+  "n_out": 21,
+  "tolerance": 1e-2,
+  "surrogate_horizon": 5
+}

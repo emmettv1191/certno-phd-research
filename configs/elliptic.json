@@ -1,0 +1,13 @@
+{
+  "name": "elliptic",
+  "n_samples": 128,
+  "n_interior": 63,
+  "length_scale": 0.2,
+  "a_min": 0.1,
+  "a_max": 1.0,
+  "smoothness": 1.5,
+  "forcing": "sin",
+  "tolerance": 5e-3,
+  "certificate_method": "analytic",
+  "a_min_assumed": 0.05
+}
