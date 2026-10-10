@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Stability factors for the a posteriori elliptic error certificate.
 
 The certificate needs the inverse of the smallest eigenvalue of the SPD
@@ -9,7 +10,6 @@ operator :math:`A_h`.  We provide:
   and is therefore usable inside a cheap online certificate.
 """
 
-from __future__ import annotations
 
 import numpy as np
 from scipy import sparse
@@ -24,7 +24,7 @@ def exact_lambda_min(A: sparse.spmatrix, *, tol: float = 1e-10) -> float:
     if n <= 2:
         return float(np.linalg.eigvalsh(A.toarray()).min())
     try:
-        val = eigsh(A, k=1, which="SA", return_eigenvectors=False, tol=tol)
+        val = eigsh(A, k=1, which="SA", return_eigenvectors=False, rtol=tol)
         return float(val[0])
     except Exception:  # pragma: no cover - dense fallback for tiny/ill-conditioned
         return float(np.linalg.eigvalsh(A.toarray()).min())
@@ -57,3 +57,20 @@ def energy_norm_error_1d(
     energy = float(np.sqrt(max(e @ (A.dot(e)), 0.0)))
     l2 = float(np.linalg.norm(e))
     return energy, l2
+
+import numpy as np
+from scipy import sparse
+from scipy.sparse.linalg import eigsh, cg
+
+from ..solvers.elliptic import laplacian_min_eig_1d, laplacian_min_eig_2d
+
+
+
+
+def corrected_bound(A, r, alpha, maxiter=200, tol=1e-10):
+    """Rigorous bound form: ||e||_2 <= ||z||_2 + ||r-Az||_2/alpha with z from CG approximation."""
+    from scipy.sparse.linalg import cg
+    r = np.asarray(r, dtype=float).ravel()
+    z, info = cg(A, r, maxiter=maxiter, rtol=tol)
+    res = r - A.dot(z)
+    return float(np.linalg.norm(z) + np.linalg.norm(res) / max(alpha, 1e-18)), float(np.linalg.norm(z)), float(np.linalg.norm(res)), info
