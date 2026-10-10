@@ -1,0 +1,60 @@
+{
+  "n_samples": 200,
+  "n": 31,
+  "rows": [
+    {
+      "tau": 0.001,
+      "accept_rate_global": 0.0,
+      "accept_rate_cg": 0.0,
+      "fnr_global": 0.0,
+      "fnr_cg": 0.0,
+      "coverage_global": 1.0,
+      "coverage_cg": 1.0
+    },
+    {
+      "tau": 0.005,
+      "accept_rate_global": 0.0,
+      "accept_rate_cg": 0.0,
+      "fnr_global": 0.0,
+      "fnr_cg": 0.0,
+      "coverage_global": 1.0,
+      "coverage_cg": 1.0
+    },
+    {
+      "tau": 0.01,
+      "accept_rate_global": 0.0,
+      "accept_rate_cg": 0.0,
+      "fnr_global": 0.0,
+      "fnr_cg": 0.0,
+      "coverage_global": 1.0,
+      "coverage_cg": 1.0
+    },
+    {
+      "tau": 0.05,
+      "accept_rate_global": 0.0,
+      "accept_rate_cg": 1.0,
+      "fnr_global": 0.0,
+      "fnr_cg": 0.0,
+      "coverage_global": 1.0,
+      "coverage_cg": 1.0
+    },
+    {
+      "tau": 0.1,
+      "accept_rate_global": 0.0,
+      "accept_rate_cg": 1.0,
+      "fnr_global": 0.0,
+      "fnr_cg": 0.0,
+      "coverage_global": 1.0,
+      "coverage_cg": 1.0
+    },
+    {
+      "tau": 0.5,
+      "accept_rate_global": 0.0,
+      "accept_rate_cg": 1.0,
+      "fnr_global": 0.0,
+      "fnr_cg": 0.0,
+      "coverage_global": 1.0,
+      "coverage_cg": 1.0
+    }
+  ]
+}

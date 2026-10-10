@@ -1,0 +1,74 @@
+{
+  "ID": {
+    "analytic": {
+      "n": 80,
+      "coverage": 1.0,
+      "fnr": 0.0,
+      "mean_err": 0.02826179259213312,
+      "mean_bound": 24.359277139463707,
+      "median_effectivity": 993.7368155601382,
+      "mean_effectivity": 1058.0481981004627,
+      "min_effectivity": 252.85157216220833
+    },
+    "cg_corrected": {
+      "n": 80,
+      "coverage": 1.0,
+      "fnr": 0.0,
+      "mean_err": 0.02826179259213312,
+      "mean_bound": 0.028261792651399546,
+      "median_effectivity": 1.0000000014054733,
+      "mean_effectivity": 1.0000000026835978,
+      "min_effectivity": 1.0000000000073266
+    },
+    "a_min_assumed": 0.05,
+    "true_a_min": 0.1
+  },
+  "OOD_contrast": {
+    "analytic": {
+      "n": 80,
+      "coverage": 1.0,
+      "fnr": 0.0,
+      "mean_err": 0.5456989990929211,
+      "mean_bound": 852.2353751503584,
+      "median_effectivity": 1469.6462376790141,
+      "mean_effectivity": 1641.9560040445008,
+      "min_effectivity": 350.4359268607515
+    },
+    "cg_corrected": {
+      "n": 80,
+      "coverage": 1.0,
+      "fnr": 0.0,
+      "mean_err": 0.5456989990929211,
+      "mean_bound": 0.5456990016735197,
+      "median_effectivity": 1.0000000030012688,
+      "mean_effectivity": 1.0000000048645652,
+      "min_effectivity": 1.0000000000406852
+    },
+    "a_min_assumed": 0.05,
+    "true_a_min": 0.1
+  },
+  "OOD_scale": {
+    "analytic": {
+      "n": 80,
+      "coverage": 1.0,
+      "fnr": 0.0,
+      "mean_err": 0.011754195451761314,
+      "mean_bound": 7.303024334413071,
+      "median_effectivity": 666.7079738294702,
+      "mean_effectivity": 660.95160306196,
+      "min_effectivity": 208.50141344334006
+    },
+    "cg_corrected": {
+      "n": 80,
+      "coverage": 1.0,
+      "fnr": 0.0,
+      "mean_err": 0.011754195451761314,
+      "mean_bound": 0.011754195458534894,
+      "median_effectivity": 1.0000000001397096,
+      "mean_effectivity": 1.0000000005967702,
+      "min_effectivity": 1.0000000000017084
+    },
+    "a_min_assumed": 0.05,
+    "true_a_min": 0.1
+  }
+}

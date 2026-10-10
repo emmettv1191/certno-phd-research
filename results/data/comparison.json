@@ -1,0 +1,42 @@
+[
+  {
+    "contrast": 1.5,
+    "cov_a": 1.0,
+    "cov_c": 1.0,
+    "fnr_a": 0.0,
+    "fnr_c": 0.0,
+    "med_a_over_e": 316.8433243052923,
+    "med_c_over_e": 1.0000000003854574,
+    "frac_acc_c": 0.0
+  },
+  {
+    "contrast": 3.0,
+    "cov_a": 1.0,
+    "cov_c": 1.0,
+    "fnr_a": 0.0,
+    "fnr_c": 0.0,
+    "med_a_over_e": 488.68452837378857,
+    "med_c_over_e": 1.000000000460929,
+    "frac_acc_c": 0.0
+  },
+  {
+    "contrast": 5.0,
+    "cov_a": 1.0,
+    "cov_c": 1.0,
+    "fnr_a": 0.0,
+    "fnr_c": 0.0,
+    "med_a_over_e": 726.2781990777969,
+    "med_c_over_e": 1.0000000011584698,
+    "frac_acc_c": 0.0
+  },
+  {
+    "contrast": 10.0,
+    "cov_a": 1.0,
+    "cov_c": 1.0,
+    "fnr_a": 0.0,
+    "fnr_c": 0.0,
+    "med_a_over_e": 1375.6453142973714,
+    "med_c_over_e": 1.0000000114122618,
+    "frac_acc_c": 0.0
+  }
+]
