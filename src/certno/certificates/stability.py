@@ -74,3 +74,13 @@ def corrected_bound(A, r, alpha, maxiter=200, tol=1e-10):
     z, info = cg(A, r, maxiter=maxiter, rtol=tol)
     res = r - A.dot(z)
     return float(np.linalg.norm(z) + np.linalg.norm(res) / max(alpha, 1e-18)), float(np.linalg.norm(z)), float(np.linalg.norm(res)), info
+
+def corrected_certificate(A, r, alpha, maxiter=150, tol=1e-10):
+    """Return (bound, z_norm, res_norm, info) for CG-corrected bound."""
+    from scipy.sparse.linalg import cg
+    import numpy as np
+    r = np.asarray(r, dtype=float).ravel()
+    z, info = cg(A, r, maxiter=maxiter, rtol=tol)
+    res = r - A.dot(z)
+    bnd = float(np.linalg.norm(z) + np.linalg.norm(res) / max(alpha, 1e-18))
+    return bnd, float(np.linalg.norm(z)), float(np.linalg.norm(res)), info
