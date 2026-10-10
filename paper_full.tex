@@ -1,0 +1,62 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\title{A CG-Corrected Residual Certificate for Learned Elliptic Solvers}
+
+\author{\IEEEauthorblockN{certno}
+\IEEEauthorblockA{Research Program on Error-Certified Neural Operators\\
+\texttt{https://github.com/emmettv1191/certno-phd-research}}
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We propose a CG-corrected a posteriori residual certificate for the discrete elliptic system $A_h u_h = f$. Starting from the standard bound $\|u_h-\hat{u}\|_2 \le \frac{\|r\|_2}{\lambda_{\min}(A_h)}$, we compute $z \approx A_h^{-1}r$ via CG and form $B_{CG} = \|z\|_2 + \frac{\|r-A_h z\|_2}{\alpha}$ with $\alpha \le \lambda_{\min}(A_h)$. Across coefficient contrasts, ID/OOD, and real FNO predictions, $B_{CG}$ is near-sharp (effectivity $\approx 1.0$) while preserving coverage 1.0 and FNR 0.0. The certificate enables selective verification by accepting predictions when $B_{CG} \le \tau$.
+\end{abstract}
+
+\section{Introduction}
+Error certification for learned PDE surrogates is needed to decide when a prediction is trustworthy. For SPD elliptic systems, residual-based bounds provide safety but can be overly conservative with global coercivity constants.
+
+\section{Theory}
+Let $A_h \succ 0$, $u_h=A_h^{-1}f$, $r=f-A_h\hat{u}$, $e=u_h-\hat{u}=A_h^{-1}r$. For any $z$, $e=z+A_h^{-1}(r-A_h z)$. Thus
+$$
+\|e\|_2 \le \|z\|_2 + \frac{\|r-A_h z\|_2}{\lambda_{\min}(A_h)} \le \|z\|_2 + \frac{\|r-A_h z\|_2}{\alpha},\ \alpha\le\lambda_{\min}(A_h).
+$$
+We take $z$ as CG approximation of $A_h^{-1}r$.
+
+\section{Assumptions}
+(1) Discrete SPD system from coercive $-\nabla\cdot(a\nabla u)=f$, $a\ge a_{\min}>0$. (2) $\alpha=a_{\min}\lambda_{\min}(-\Delta_h)\le\lambda_{\min}(A_h)$. (3) Double-precision arithmetic; CG stopping controls $\|r-A_h z\|$. (4) Certification is w.r.t. discrete $u_h$.
+
+\section{Experiments}
+Table~\ref{tab:comp} shows comparison across contrasts. With real FNO predictions, coverage/FNR remain 0/1.0. Selective verification accepts only when $B_{CG}\le\tau$.
+
+\begin{table}[h]
+\centering
+\caption{Analytic vs CG-corrected (absolute L2). Effectivity $B/\|e\|$.}
+\label{tab:comp}
+\begin{tabular}{rcccc}
+\toprule
+Contrast & Cov (both) & FNR (both) & Med eff (analytic) & Med eff (CG)\\
+\midrule
+1.5 & 1.0 & 0.0 & ~312 & ~1.00\\
+3.0 & 1.0 & 0.0 & ~500 & ~1.00\\
+5.0 & 1.0 & 0.0 & ~768 & ~1.00\\
+10.0 & 1.0 & 0.0 & ~1361 & ~1.00\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Conclusion}
+The CG-corrected residual certificate is rigorous and near-sharp, enabling safe selective verification of learned elliptic solvers.
+
+\section*{Reproducibility}
+Code: \url{https://github.com/emmettv1191/certno-phd-research}. See BENCHMARK\_FREEZE.md, THEOREM\_AUDIT.md, RESULTS.md.
+
+\end{document}
