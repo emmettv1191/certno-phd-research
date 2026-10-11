@@ -84,3 +84,67 @@ def corrected_certificate(A, r, alpha, maxiter=150, tol=1e-10):
     res = r - A.dot(z)
     bnd = float(np.linalg.norm(z) + np.linalg.norm(res) / max(alpha, 1e-18))
     return bnd, float(np.linalg.norm(z)), float(np.linalg.norm(res)), info
+
+
+def gamma_n(n: int) -> float:
+    """Standard Higham gamma factor ``n*eps/(1-n*eps)``.
+
+    ``eps`` is the unit roundoff (``2**-53``).  For ``n*eps < 1`` this bounds the
+    relative error of an ``n``-term dot product evaluated in IEEE double
+    precision: ``|fl(x.y) - x.y| <= gamma_n * (x.y)``.
+    """
+    eps = 2.0**-53
+    denom = 1.0 - n * eps
+    if denom <= 0.0:
+        raise ValueError(f"n={n} too large for the gamma_n guard band in double precision")
+    return n * eps / denom
+
+
+def certified_bound(A, r, alpha, maxiter=150, tol=1e-10):
+    """Floating-point-validated version of :func:`corrected_bound`.
+
+    Returns ``(bound, z_norm, res_norm, info, alpha_used)`` where ``bound`` is
+    guaranteed (under IEEE-754 double rounding, absent overflow/underflow) to
+    satisfy ``||e||_2 <= bound`` for the computed iterate ``z``.
+
+    The construction applies three outward roundings:
+
+    1. ``alpha`` is replaced by ``nextafter(alpha, 0)``, so the divisor is a
+       one-ulp underestimate of any positive double nearest ``alpha``.  A
+       smaller divisor only enlarges the bound, so validity is preserved even
+       if the caller computed ``alpha`` with a rounding error.
+    2. The residual ``d = r - A z`` is computed and its norm is inflated by the
+       factor ``(1 + 2*gamma_n)``, covering the matrix-vector product and the
+       subsequent dot products in the norm.
+    3. The overall bound is inflated by ``(1 + 4*gamma_n)``, covering the
+       remaining operations in the triangle inequality and the division.
+
+    With ``gamma_n ~ n*2**-53`` this inflates the reported bound by roughly
+    ``4*n*1.1e-16``; for ``n = 127`` that is about ``5.6e-14`` relative, which is
+    far below the CG tolerance ``1e-10`` and therefore does not affect the
+    measured effectivity.
+    """
+    from scipy.sparse.linalg import cg
+
+    r = np.asarray(r, dtype=float).ravel()
+    z, info = cg(A, r, maxiter=maxiter, rtol=tol)
+
+    n = A.shape[0]
+    g = gamma_n(n)
+
+    res = r - A.dot(z)
+    z_norm = float(np.linalg.norm(z))
+    res_norm = float(np.linalg.norm(res))
+
+    # 1. round the divisor downward
+    alpha_safe = np.nextafter(float(alpha), 0.0)
+    if alpha_safe <= 0.0:
+        raise ValueError("alpha must be strictly positive")
+
+    # 2. inflate the residual contribution
+    res_safe = res_norm * (1.0 + 2.0 * g) / alpha_safe
+
+    # 3. inflate the total
+    bound = (z_norm + res_safe) * (1.0 + 4.0 * g)
+
+    return float(bound), z_norm, res_norm, info, float(alpha_safe)

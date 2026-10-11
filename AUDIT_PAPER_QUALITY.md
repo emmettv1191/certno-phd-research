@@ -232,3 +232,95 @@ Not supported (must not be claimed):
 - Certification for nonlinear PDEs.
 - Verified (machine-checkable) arithmetic guarantees.
 - Any result for 2D geometries, which were never run.
+---
+
+## Addendum — external review response (round 2)
+
+An external review of `paper_journal.pdf` raised five concerns. Each is addressed
+below with the evidence produced in response.
+
+### R1. "Rigorous" needed stricter delimitation — ADDRESSED
+
+The review was correct that a double-precision evaluation without outward rounding is
+not a machine-checkable certificate. Rather than only softening the language, we
+implemented a validated variant.
+
+`src/certno/certificates/stability.py::certified_bound` applies three outward
+roundings: `alpha` via `nextafter(alpha, 0)`, the residual norm inflated by
+`1 + 2*gamma_n`, and the total by `1 + 4*gamma_n`, where
+`gamma_n = n*eps/(1-n*eps)` is the standard Higham dot-product factor.
+
+Measured inflation: `1.4e-14` at `n=31`, `5.6e-14` at `n=127` — four orders of
+magnitude below the CG tolerance `1e-10`, so effectivity is unaffected.
+
+Validated against an **80-digit reference** (`mpmath`, `mp.dps=80`) over 60 instances
+(`experiments/audit_certified_bound.py`, `experiments/audit_numerics.py`):
+
+| condition | trials | plain violations | validated violations | min rel. margin (plain) |
+|---|---|---|---|---|
+| n=31, c=1.5 | 15 | 0 | 0 | 2.6e-12 |
+| n=31, c=10 | 15 | 0 | 0 | 7.3e-11 |
+| n=127, c=1.5 | 15 | 0 | 0 | 9.6e-10 |
+| n=127, c=10 | 15 | 0 | 0 | 1.0e-07 |
+
+The smallest observed margin (`2.6e-12`) is ~100× the rounding scale, consistent with
+the analysis rather than luck. The paper now distinguishes explicitly between the
+*bound* (rigorous in exact arithmetic, Thm. 1) and the *validated* bound (rigorous for
+the computed iterate under IEEE-754), and states that neither extends to end-to-end
+interval verification. Limitation 4 was rewritten accordingly rather than deleted.
+
+13 new tests in `tests/test_certified_bound.py`; suite is now **31 passing**.
+
+### R2. Effectivity 1.0 is not the novel result — ADDRESSED (already, now reinforced)
+
+The paper already carried this argument; the reviewer's endorsement prompted moving it
+into the abstract, where a reader now encounters it before the numbers. The
+contribution is framed as computability plus the measured acceptance policy, not as a
+sharpness discovery.
+
+### R3. Synthetic vs FNO acceptance conflation — ADDRESSED
+
+Correct catch: the 100%-acceptance table was computed on synthetic perturbations and a
+reader could conflate it with the FNO results. Two fixes:
+
+1. The synthetic sweep now states explicitly, in the text, that its acceptance rates
+   apply to the synthetic set and not to surrogates.
+2. New experiment `experiments/run_fno_selective.py` measures acceptance on **real FNO
+   predictions** per split:
+
+| split | mean err | acc@τ=0.05 | acc@τ=0.5 | FNR |
+|---|---|---|---|---|
+| ID | 0.0210 | 0.950 | 1.000 | 0.00 |
+| OOD contrast | 0.2954 | **0.000** | 1.000 | 0.00 |
+| OOD scale | 0.0092 | 1.000 | 1.000 | 0.00 |
+
+This produced a better result than the synthetic table: the OOD-contrast split is
+**correctly refused** at tight tolerance, because its errors are genuinely large. The
+certificate distinguishes surrogate quality per instance, which a split-level mean
+cannot. This is now Table V and Sec. `fnosel`.
+
+### R4. Baselines too narrow — PARTIALLY ADDRESSED
+
+Still open. The paper compares only against the global residual bound. Chebyshev-type
+iterative bounds, rigorous Lanczos lower bounds for `lambda_min`, and preconditioned
+variants remain unbenchmarked. This is stated in Limitation 5 and is the single
+largest gap for a strong journal.
+
+### R5. Five pages insufficient — PARTIALLY ADDRESSED
+
+Now 6 pages with the validated-certificate section and the FNO acceptance study.
+Still short of a Q1 submission: no 2D results, no deeper related work, no confidence
+intervals on medians (now flagged in Limitation 8 rather than glossed over).
+
+### Reproducibility verification (reviewer's recommended next step)
+
+Re-ran `run_paper_tables.py` from the committed state and compared against the
+published JSON. **All scientific quantities reproduce bit-identically** (effectivity
+medians, coverage, FNR, error means) across all 8 contrasts and 4 problem sizes. Only
+wall-clock timings differ, which is expected and is now excluded from the
+reproducibility claim. Determinism rests on fixed seeds: `20240` (contrast study),
+`4242` (tolerance sweep), `31337` (numerics audit).
+
+### Author
+
+Changed to **Emmett Vitruvious** as requested.

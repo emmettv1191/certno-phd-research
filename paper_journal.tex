@@ -21,13 +21,13 @@
 \newtheorem{remark}{Remark}
 
 \title{A Computable CG-Corrected Residual Certificate for Learned Elliptic Solvers}
-\author{Error-Certified Neural Operators Project}
+\author{Emmett Vitruvious}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-We present a computable a posteriori certificate for the \emph{discrete} error of a learned surrogate of the elliptic system $A_h u_h=f$, obtained from $-\nabla\cdot(a\nabla u)=f$. Given a candidate $\hat u$, the exact identity $e=u_h-\hat u=A_h^{-1}r$, $r=f-A_h\hat u$, yields the classical bound $\|e\|_2\le\|r\|_2/\lambda_{\min}(A_h)$, which is safe but ignores the structure of $r$ and becomes severely conservative for heterogeneous coefficients. We instead compute $z$ by applying conjugate gradients to $A_h z=r$ and form $B_{\mathrm{CG}}=\|z\|_2+\|r-A_hz\|_2/\alpha$ with a coercivity-based $\alpha=a_{\min}\lambda_{\min}(-\Delta_h)\le\lambda_{\min}(A_h)$. We prove $B_{\mathrm{CG}}\ge\|e\|_2$ for arbitrary $z$, and we state explicitly the scope of that guarantee: it bounds the algebraic error with respect to $u_h$ and is silent about discretization error, which no residual-based estimator can detect. In experiments computed from scratch for this manuscript ($200$ coefficient fields per contrast, eight contrasts, and $80$ real trained-FNO predictions per test split, including two out-of-distribution splits) we measure median effectivity $1.000000$ for $B_{\mathrm{CG}}$ against $316$--$1429$ for the global bound. Because the certified quantity is itself an algebraic residual, near-unit effectivity reflects optimality on the declared target rather than a discovered property; the practically meaningful consequences are a measured acceptance policy---at tolerance $\tau=5\times10^{-2}$ the certificate accepts $100\%$ of instances where the global bound accepts $0\%$, both with zero false negatives---and a cost of $3.7$--$33$ ms per instance for $15\le n\le127$. All code, raw JSON outputs, and the frozen configuration are public.
+We present a computable a posteriori certificate for the \emph{discrete} error of a learned surrogate of the elliptic system $A_h u_h=f$, obtained from $-\nabla\cdot(a\nabla u)=f$. Given a candidate $\hat u$, the exact identity $e=u_h-\hat u=A_h^{-1}r$, $r=f-A_h\hat u$, yields the classical bound $\|e\|_2\le\|r\|_2/\lambda_{\min}(A_h)$, which is safe but ignores the structure of $r$ and becomes severely conservative for heterogeneous coefficients. We instead compute $z$ by applying conjugate gradients to $A_h z=r$ and form $B_{\mathrm{CG}}=\|z\|_2+\|r-A_hz\|_2/\alpha$ with a coercivity-based $\alpha=a_{\min}\lambda_{\min}(-\Delta_h)\le\lambda_{\min}(A_h)$. We prove $B_{\mathrm{CG}}\ge\|e\|_2$ for arbitrary $z$, and we state explicitly the scope of that guarantee: it bounds the algebraic error with respect to $u_h$ and is silent about discretization error, which no residual-based estimator can detect. In experiments computed from scratch for this manuscript ($200$ coefficient fields per contrast, eight contrasts, and $80$ real trained-FNO predictions per test split, including two out-of-distribution splits) we measure median effectivity $1.000000$ for $B_{\mathrm{CG}}$ against $316$--$1429$ for the global bound. We additionally provide a floating-point-validated variant with outward-rounded quantities, checked against an $80$-digit reference, so the reported number is a validated rather than merely empirical certificate. Because the certified quantity is itself an algebraic residual, near-unit effectivity reflects optimality on the declared target rather than a discovered property; the practically meaningful consequences are a measured acceptance policy---at tolerance $\tau=5\times10^{-2}$ on synthetic perturbations the certificate accepts $100\%$ of instances where the global bound accepts $0\%$, both with zero false negatives---while on out-of-distribution FNO predictions, where errors are an order of magnitude larger, it correctly refuses to certify at tight tolerances---and a cost of $3.7$--$33$ ms per instance for $15\le n\le127$. All code, raw JSON outputs, and the frozen configuration are public.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -162,6 +162,50 @@ residual $r-A_hz$. Since that residual is recomputed from $z$ rather than accumu
 through the iteration, the quantity entering \eqref{eq:bcg} is the true residual of the
 returned vector up to rounding of the matrix-vector product. Adding a validated guard
 band would convert this into a machine-checkable certificate; we regard it as future work.
+\end{remark}
+
+\subsection{From a numerical to a validated certificate}
+\label{sec:validated}
+The bound in \eqref{eq:bcg} is a statement about exact arithmetic. Evaluating it in
+IEEE double precision raises a fair objection: nothing in Theorem~\ref{thm:cg} prevents
+$\|z\|+\|r-A_hz\|/\alpha$ from being rounded \emph{down} below $\|e\|$. We therefore
+also implement a validated variant, available as \texttt{certified\_bound}, that applies
+three outward roundings and is valid for the computed iterate.
+
+Let $\varepsilon=2^{-53}$ be the unit roundoff and
+$\gamma_n=n\varepsilon/(1-n\varepsilon)$ the standard Higham factor bounding the
+relative error of an $n$-term dot product \cite{higham2002accuracy}. We compute
+\begin{enumerate}
+\item $\alpha_{\mathrm{safe}} = \mathrm{nextafter}(\alpha,0)$, so the divisor is a
+one-ulp underestimate of the nearest double. Since a smaller divisor only enlarges
+$\|r-A_hz\|/\alpha$, the bound remains valid even if the caller computed $\alpha$ with
+a rounding error of one ulp.
+\item $\|r-A_hz\|_{\mathrm{safe}} = (1+2\gamma_n)\|r-A_hz\|$, covering the
+matrix-vector product and the norm.
+\item $B_{\mathrm{safe}} = (1+4\gamma_n)\bigl(\|z\|+\|r-A_hz\|_{\mathrm{safe}}/\alpha_{\mathrm{safe}}\bigr)$.
+\end{enumerate}
+The inflation is $O(n\varepsilon)$: for $n=127$ we measure a maximum relative
+inflation of $5.6\times10^{-14}$, four orders of magnitude below the CG tolerance
+$10^{-10}$ and therefore immaterial to the effectivity reported in
+Sec.~\ref{sec:results}.
+
+We validate this empirically against an $80$-digit reference. Solving
+$A_hu_h=f$ in 80-digit arithmetic (\texttt{mpmath}) and comparing, over $60$ instances
+spanning $n\in\{31,127\}$ and contrast $\in\{1.5,10\}$, we observe zero violations for
+both the plain and the validated bound. The smallest relative margin
+$(B-\|e\|)/\|e\|$ of the plain bound is $2.6\times10^{-12}$, comfortably above the
+$\sim10^{-14}$ rounding scale, so the empirical agreement is consistent with the
+analysis rather than with luck. We emphasize that $60$ instances is a sanity check,
+not a proof; the guarantee rests on \eqref{eq:bcg} together with the three roundings
+above, and the experiments merely confirm the implementation matches the argument.
+
+\begin{remark}[What "rigorous" means here]
+We use two distinct terms. The \emph{bound} \eqref{eq:bcg} is mathematically rigorous:
+under Assumption~\ref{ass:cg} it holds in exact arithmetic. The \emph{validated}
+bound of Sec.~\ref{sec:validated} is what the code returns, and is rigorous for the
+computed iterate $z$ in IEEE double precision, up to the standard assumptions that no
+overflow or catastrophic underflow occurs. Neither claim extends to interval-arithmetic
+verification of the entire pipeline, which we do not perform.
 \end{remark}
 
 \section{Scope of the Guarantee}\label{sec:scope}
@@ -314,7 +358,7 @@ out-of-distribution shifts.}
 \end{figure}
 
 \subsection{Selective verification}
-Table~\ref{tab:selective} and Fig.~\ref{fig:sel} sweep the tolerance $\tau$. The
+Table~\ref{tab:selective} and Fig.~\ref{fig:sel} sweep the tolerance $\tau$ over the \emph{synthetic} instance set, in which $\hat u$ is the discrete solution perturbed by Gaussian noise of scale $0.005$. This is the setting in which the certificate is expected to be sharp, because the error is purely algebraic by construction; the acceptance rates here must not be read as applying to trained surrogates, whose error distribution is much wider. That separate measurement is given in Sec.~\ref{sec:fnosel}. The
 contrast between the two policies is unambiguous: for $\tau\ge5\times10^{-2}$ the
 CG-corrected certificate accepts every instance, while the global bound accepts none,
 because its values exceed $0.5$. FNR is zero for both throughout, as Proposition~\ref{prop:sound}
@@ -349,6 +393,50 @@ tested range; the CG-corrected certificate accepts all instances once
 $\tau\ge5\times10^{-2}$, with no false negatives.}
 \label{fig:sel}
 \end{figure}
+
+\subsection{Selective verification on FNO predictions}
+\label{sec:fnosel}
+Table~\ref{tab:fnosel} repeats the tolerance sweep on the trained-FNO splits, and
+should be read together with Table~\ref{tab:selective} rather than confused with it:
+the earlier sweep uses synthetic perturbations of the discrete solution, whereas this
+one uses real surrogate outputs, whose error distribution is far wider. The contrast
+between the two is the point.
+
+On the in-distribution and OOD-scale splits the surrogate is accurate (mean errors
+$0.021$ and $0.009$) and the validated certificate accepts $95\%$ and $100\%$ of
+instances respectively at $\tau=0.05$. On the OOD-contrast split the mean error is
+$0.295$, roughly an order of magnitude larger, and the certificate accepts \emph{none}
+of the instances at $\tau\le0.1$, accepting all only once $\tau$ reaches $0.5$. This is
+the desired behaviour: a distribution shift that genuinely degrades the surrogate
+produces a certificate that refuses to certify it. A statistical uncertainty estimate
+averaged over the test set would not distinguish these two regimes, because the mean
+error is a property of the split rather than of an individual prediction.
+
+\begin{table}[t]
+\centering
+\caption{Selective verification on trained-FNO predictions ($80$ instances per split).
+``acc.'' is the fraction with $B\le\tau$. The OOD-contrast split is correctly refused
+at tight tolerances, where its errors are large.}
+\label{tab:fnosel}
+\begin{tabular}{lrrrrr}
+\toprule
+split & $\tau$ & acc. glob. & acc. cert. & FNR glob. & FNR cert.\\
+\midrule
+ID & $0.01$ & 0.000 & 0.125 & 0.00 & 0.00 \\
+ID & $0.05$ & 0.000 & 0.950 & 0.00 & 0.00 \\
+ID & $0.10$ & 0.000 & 1.000 & 0.00 & 0.00 \\
+ID & $0.50$ & 0.000 & 1.000 & 0.00 & 0.00 \\
+OOD contrast & $0.01$ & 0.000 & 0.000 & 0.00 & 0.00 \\
+OOD contrast & $0.05$ & 0.000 & 0.000 & 0.00 & 0.00 \\
+OOD contrast & $0.10$ & 0.000 & 0.000 & 0.00 & 0.00 \\
+OOD contrast & $0.50$ & 0.000 & 1.000 & 0.00 & 0.00 \\
+OOD scale & $0.01$ & 0.000 & 0.863 & 0.00 & 0.00 \\
+OOD scale & $0.05$ & 0.000 & 1.000 & 0.00 & 0.00 \\
+OOD scale & $0.10$ & 0.000 & 1.000 & 0.00 & 0.00 \\
+OOD scale & $0.50$ & 0.000 & 1.000 & 0.00 & 0.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Cost}
 Table~\ref{tab:size} and Fig.~\ref{fig:cost}. Median certificate cost grows from
@@ -415,9 +503,11 @@ report results for it.
 \item Only linear SPD systems are covered. Nonlinear problems present in the same
 codebase (Burgers, reaction--diffusion) have no certificate, and we make no claim about
 them.
-\item \emph{Verified arithmetic.} No outward rounding or validated guard band is applied,
-so the reported bounds are numerical certificates rather than machine-checkable ones
-(Sec.~\ref{sec:scope} and the remark following \eqref{eq:alpha}).
+\item \emph{Validation scope.} We apply validated outward rounding
+(Sec.~\ref{sec:validated}) but do not wrap the pipeline in interval arithmetic
+end to end: the validation covers the certificate evaluation, not the assembly
+of $A_h$, the coefficient sampling, or the CG iteration itself, each of which is
+assumed exact in the sense of Assumption~\ref{ass:cg}.
 \item \emph{Baselines.} We compare against the global residual bound. Chebyshev-type
 iterative bounds, Lanczos-based rigorous lower bounds for $\lambda_{\min}$, and
 preconditioned variants are not benchmarked, and we do not claim optimality against them.
@@ -428,6 +518,10 @@ evidence that the implementation matches the proof.
 \item \emph{Sampling.} $200$ instances per condition is enough to resolve effectivities
 that differ by three orders of magnitude, but not enough to estimate tail behaviour of
 the error distribution, which we do not attempt to characterize.
+\item \emph{Metric uncertainty.} Effectivity medians are reported without confidence
+intervals. The between-condition differences reported here (three orders of magnitude,
+and a step change in acceptance rate) are far larger than sampling variability at $n=200$,
+but we have not quantified the sampling error on the medians themselves.
 \end{enumerate}
 
 \section{Conclusion}
@@ -447,11 +541,11 @@ configuration are available in the accompanying repository.
 
 \section*{Reproducibility}\label{sec:repro}
 Revision \texttt{15b16d5}. Raw outputs: \texttt{results/data/paper\_tables.json},
-\texttt{results/data/selective.json}, \texttt{results/data/fno\_certified.json},
+\texttt{results/data/selective.json}, \texttt{results/data/fno\_certified.json}, \texttt{results/data/fno\_selective.json}, \texttt{results/data/certified\_bound\_audit.json},
 \texttt{results/data/comparison.json}. Scripts:
 \texttt{experiments/run\_paper\_tables.py}, \texttt{experiments/run\_selective\_table.py},
 \texttt{experiments/run\_corrected\_fno\_cert.py}, \texttt{experiments/gen\_figures.py}.
-Tests: \texttt{pytest} (18 passing). Seeds: $20240$ (contrast study), $4242$
+Tests: \texttt{pytest} (31 passing, including \texttt{tests/test\_certified\_bound.py}). Validation: \texttt{experiments/audit\_certified\_bound.py} (validated bound vs.\ $80$-digit reference), \texttt{experiments/audit\_numerics.py}. Seeds: $20240$ (contrast study), $4242$
 (tolerance sweep), $0$ (FNO training), $123$/$321$/$777$ (test splits). An audit of
 these results, including corrections to earlier drafts, is in
 \texttt{AUDIT\_PAPER\_QUALITY.md}.

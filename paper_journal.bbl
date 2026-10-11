@@ -1,0 +1,99 @@
+\begin{thebibliography}{10}
+
+\bibitem{ainsworth2000posteriori}
+Mark Ainsworth and J.~Tinsley Oden.
+\newblock {\em A Posteriori Error Estimation in Finite Element Analysis}.
+\newblock Wiley, 2000.
+
+\bibitem{azizzadenesheli2024neural}
+Kamyar Azizzadenesheli, Nikola Kovachki, Zongyi Li, Miguel Liu-Schiaffini, Jean
+  Kossaifi, and Anima Anandkumar.
+\newblock Neural operators for accelerating scientific simulations and design.
+\newblock {\em Nature Reviews Physics}, 6:320--328, 2024.
+
+\bibitem{baheri2026formal}
+Ali Baheri and Ignacio Laguna~Peralta.
+\newblock Can we formally verify neural {PDE} surrogates? {SMT} compilation of
+  small {Fourier} neural operators.
+\newblock {\em arXiv preprint arXiv:2605.08938}, 2026.
+
+\bibitem{conforti2023residual}
+Geoffrey Crawford and Inder Dhillon.
+\newblock Residual-based error corrector operator to enhance accuracy and
+  reliability of neural operator surrogates of nonlinear variational
+  boundary-value problems.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering}, 407,
+  2023.
+
+\bibitem{ernst2025aposteriori}
+Lewin Ernst, Nikolaos Rekatsinas, and Karsten Urban.
+\newblock A posteriori certification of {PDE} approximations with particular
+  application to neural networks.
+\newblock {\em arXiv preprint arXiv:2502.20336}, 2025.
+
+\bibitem{higham2002accuracy}
+Nicholas~J. Higham.
+\newblock {\em Accuracy and Stability of Numerical Algorithms}.
+\newblock SIAM, 2nd edition, 2002.
+
+\bibitem{jiranek2010posteriori}
+Pavel Jir{\'a}nek, Zden{\v{e}}k Strako{\v{s}}, and Martin Vohral{\'\i}k.
+\newblock A posteriori error estimates including algebraic error and stopping
+  criteria for iterative solvers.
+\newblock {\em SIAM Journal on Scientific Computing}, 32(3):1567--1590, 2010.
+
+\bibitem{kovachki2023neural}
+Nikola~B Kovachki, Zongyi Li, Burigede Liu, Kamyar Azizzadenesheli, Kaushik
+  Bhattacharya, Andrew~M Stuart, and Anima Anandkumar.
+\newblock Neural operator: Learning maps between function spaces.
+\newblock {\em Journal of Machine Learning Research}, 24(89):1--97, 2023.
+
+\bibitem{li2020fourier}
+Zongyi Li, Nikola Kovachki, Kamyar Azizzadenesheli, Burigede Liu, Kaushik
+  Bhattacharya, Andrew Stuart, and Anima Anandkumar.
+\newblock Fourier neural operator for parametric partial differential
+  equations.
+\newblock In {\em International Conference on Learning Representations (ICLR)},
+  2021.
+
+\bibitem{lu2021learning}
+Lu~Lu, Pengzhan Jin, Guofei Pang, Zhongqiang Zhang, and George~Em Karniadakis.
+\newblock Learning nonlinear operators via {D}eep{ON}et based on the universal
+  approximation theorem of operators.
+\newblock {\em Nature Machine Intelligence}, 3(3):218--229, 2021.
+
+\bibitem{meurant1999computable}
+G{\'e}rard Meurant.
+\newblock Computable error bounds for {CG}.
+\newblock {\em Numerical Algorithms}, 22:79--88, 1999.
+
+\bibitem{meurant2013accuracy}
+G{\'e}rard Meurant and Petr Tich{\'y}.
+\newblock On the accuracy of the {CG} error estimates.
+\newblock {\em Numerical Algorithms}, 62:435--464, 2013.
+
+\bibitem{mukherjee2026rigorous}
+Amartya Mukherjee, Maxwell Fitzsimmons, David~C. Del Rey~Fern{\'a}ndez, and Jun
+  Liu.
+\newblock Rigorous error certification for neural {PDE} solvers: from empirical
+  residuals to solution guarantees.
+\newblock {\em arXiv preprint arXiv:2603.19165}, 2026.
+
+\bibitem{song2026structure}
+Haoze Song, Zhihao Li, Mengyi Deng, Xin Li, Duyi Pan, Zhilu Lai, and Wei Wang.
+\newblock Structure-aware epistemic uncertainty quantification for neural
+  operator {PDE} surrogates.
+\newblock {\em arXiv preprint arXiv:2603.11052}, 2026.
+
+\bibitem{verfurth2013posteriori}
+R{\"u}diger Verf{\"u}rth.
+\newblock {\em A Posteriori Error Estimation Techniques for Finite Element
+  Methods}.
+\newblock Oxford University Press, 2013.
+
+\bibitem{zou2025uq}
+Xuhua Zou, Dezhi Huang, Zhongming Cai, et~al.
+\newblock Uncertainty quantification and stability of neural operators.
+\newblock {\em Journal of Computational Physics}, 2025.
+
+\end{thebibliography}
